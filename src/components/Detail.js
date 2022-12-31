@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../firebase";
 import Comment from "./Comment";
+import Style from "../styles/Detail.module.css";
 
 const Detail = ({ userObj }) => {
   const [movieDetail, setMovieDetail] = useState(null);
@@ -36,6 +37,7 @@ const Detail = ({ userObj }) => {
       if (comment !== "'") {
         await addDoc(collection(db, id), {
           creator: userObj.uid,
+          displayName: userObj.displayName,
           createdAt: Date.now(),
           text: comment,
         });
@@ -63,8 +65,8 @@ const Detail = ({ userObj }) => {
   }, []);
 
   return (
-    <>
-      <div>
+    <div className={Style.DetailContainer}>
+      <div className={Style.DetailContainer}>
         {movieDetail ? (
           <>
             <img src={movieDetail.large_cover_image} alt="cover_image" />
@@ -72,33 +74,40 @@ const Detail = ({ userObj }) => {
               <h1>{movieDetail.title}</h1>
               <p>{movieDetail.description_full}</p>
             </div>
+            <div className={Style.userComments}>
+              {userObj && (
+                <>
+                  <form onSubmit={onSubmit}>
+                    <input
+                      onChange={onChange}
+                      value={comment}
+                      type="text"
+                      maxLength={300}
+                      placeholder="한줄평을 남겨주세요"
+                    />
+                    <button>추가</button>
+                  </form>
+                  <div>
+                    {comments.map((comment) => {
+                      return (
+                        <Comment
+                          key={comment.id}
+                          comment={comment}
+                          userObj={userObj}
+                          id={id}
+                        />
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
           </>
         ) : (
           "Loading ..."
         )}
       </div>
-      <div className="userComments">
-        {userObj && (
-          <>
-            <form onSubmit={onSubmit}>
-              <input
-                onChange={onChange}
-                value={comment}
-                type="text"
-                maxLength={300}
-                placeholder="한줄평을 남겨주세요"
-              />
-              <button>추가</button>
-            </form>
-            <div>
-              {comments.map((comment) => {
-                return <Comment key={comment.id} comment={comment} />;
-              })}
-            </div>
-          </>
-        )}
-      </div>
-    </>
+    </div>
   );
 };
 

@@ -1,0 +1,29 @@
+.DetailContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.userComments {
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+}
+
+form {
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  height: 60px;
+  text-align: center;
+}
+
+input::placeholder {
+  font-size: 18px;
+  text-align: center;
+  opacity: 0.5;
+}

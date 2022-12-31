@@ -1,8 +1,11 @@
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { useState } from "react";
 import { db } from "../firebase";
 import Style from "../styles/Comment.module.css";
 
 const Comment = ({ comment, userObj, id }) => {
+  const [newComment, setNewComment] = useState("");
+  const [edit, setEdit] = useState(false);
   const createdAt = new Date(comment.createdAt);
 
   const fillZero = (data) => {
@@ -19,25 +22,51 @@ const Comment = ({ comment, userObj, id }) => {
       }
     }
   };
-
+  const toggleEdit = () => {
+    setEdit((prev) => !prev);
+    setNewComment(comment.text);
+  };
+  const onChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setNewComment(value);
+  };
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    await updateDoc(doc(db, id, comment.id), "text", newComment);
+    toggleEdit();
+  };
   return (
     <div className={Style.commentBox}>
       <div className={Style.Name}>
         {comment.displayName}
         {userObj.uid === comment.creator ? (
           <div className={Style.EditOrDelete}>
-            <span>수정</span>/<span onClick={onDelete}>삭제</span>
+            <span onClick={toggleEdit}>{edit ? "취소" : "수정"}</span>/
+            <span onClick={onDelete}>삭제</span>
           </div>
         ) : null}
       </div>
-      <div className={Style.Text}>{comment.text}</div>
-      <div className={Style.Time}>
-        {`${fillZero(createdAt.getFullYear())}-${fillZero(
-          createdAt.getMonth()
-        )}-${fillZero(createdAt.getDay())} ${fillZero(
-          createdAt.getHours()
-        )} : ${fillZero(createdAt.getMinutes())}`}
+      <div className={Style.Text}>
+        {edit ? (
+          <form onSubmit={onSubmit}>
+            <input type="text" onChange={onChange} value={newComment} />
+            <button className={Style.EditButton}>수정하기</button>
+          </form>
+        ) : (
+          comment.text
+        )}
       </div>
+      {edit ? null : (
+        <div className={Style.Time}>
+          {`${fillZero(createdAt.getFullYear())}-${fillZero(
+            createdAt.getMonth()
+          )}-${fillZero(createdAt.getDay())} ${fillZero(
+            createdAt.getHours()
+          )} : ${fillZero(createdAt.getMinutes())}`}
+        </div>
+      )}
     </div>
   );
 };

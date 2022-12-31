@@ -32,3 +32,13 @@
   text-decoration-line: underline;
   cursor: pointer;
 }
+
+.EditButton {
+  margin: auto;
+  display: block;
+}
+
+.EditButton:hover {
+  text-decoration-line: underline;
+  cursor: pointer;
+}

@@ -13,3 +13,7 @@
   flex-direction: column;
   margin-left: 30px;
 }
+
+.MovieDetailLink:visited {
+  color: blue;
+}

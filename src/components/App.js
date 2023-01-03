@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import AppRouter from "./Router";
 import { auth } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, updateCurrentUser } from "firebase/auth";
 
 function App() {
   const [isLoggin, setIsLoggin] = useState(false);
   const [userObj, setUserObj] = useState(null);
+  const refreshUser = async () => {
+    await updateCurrentUser(auth, auth.currentUser);
+    setUserObj(auth.currentUser);
+  };
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -18,7 +23,13 @@ function App() {
     });
   }, []);
 
-  return <AppRouter isLoggin={isLoggin} userObj={userObj} />;
+  return (
+    <AppRouter
+      refreshUser={refreshUser}
+      isLoggin={isLoggin}
+      userObj={userObj}
+    />
+  );
 }
 
 export default App;

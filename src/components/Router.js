@@ -1,11 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Authentication from "../routes/Auth";
 import Home from "../routes/Home";
+import Profile from "../routes/Profile";
 import SignUp from "../routes/SignUp";
 import Detail from "./Detail";
 import Navigation from "./Navigation";
 
-const AppRouter = ({ isLoggin, userObj }) => {
+const AppRouter = ({ refreshUser, isLoggin, userObj }) => {
   return (
     <Router basename={process.env.PUBLIC_URL}>
       <Navigation userObj={userObj} isLoggin={isLoggin} />
@@ -21,6 +22,11 @@ const AppRouter = ({ isLoggin, userObj }) => {
               exact
               path="/detail/:id"
               element={<Detail userObj={userObj} />}
+            ></Route>
+            <Route
+              exact
+              path="/profile"
+              element={<Profile refreshUser={refreshUser} userObj={userObj} />}
             ></Route>
           </>
         ) : (

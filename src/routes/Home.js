@@ -34,6 +34,7 @@ const Home = ({ isLoggin, userObj }) => {
                 title={movie.title}
                 summary={movie.summary}
                 genres={movie.genres}
+                userObj={userObj}
               />
             );
           })}

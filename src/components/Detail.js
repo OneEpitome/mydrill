@@ -1,9 +1,11 @@
 import {
   addDoc,
   collection,
+  collectionGroup,
   onSnapshot,
   orderBy,
   query,
+  where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -34,12 +36,15 @@ const Detail = ({ userObj }) => {
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
-      if (comment !== "'") {
-        await addDoc(collection(db, id), {
+      if (comment !== "") {
+        await addDoc(collection(db, "Users", userObj.uid, "Reviews"), {
+          // Firestore 구조 : Users/user의 uid/영화고유넘버/유저의 코멘트
           creator: userObj.uid,
           displayName: userObj.displayName,
           createdAt: Date.now(),
           text: comment,
+          movieId: id,
+          movieTitle: movieDetail.title,
         });
         setComment("");
       }
@@ -50,7 +55,11 @@ const Detail = ({ userObj }) => {
   };
 
   const getComments = () => {
-    const q = query(collection(db, id), orderBy("createdAt", "desc"));
+    const q = query(
+      collectionGroup(db, "Reviews"),
+      orderBy("createdAt", "desc"),
+      where("movieId", "==", id)
+    ); // collectionGroup 으로 수정해야함
     onSnapshot(q, (querySnapshot) => {
       const newComments = querySnapshot.docs.map((doc) => {
         return { ...doc.data(), id: doc.id };

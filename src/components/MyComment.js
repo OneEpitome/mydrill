@@ -3,7 +3,7 @@ import { useState } from "react";
 import { db } from "../firebase";
 import Style from "../styles/Comment.module.css";
 
-const Comment = ({ comment, userObj, id }) => {
+const MyComment = ({ comment, userObj }) => {
   const [newComment, setNewComment] = useState("");
   const [edit, setEdit] = useState(false);
   const createdAt = new Date(comment.createdAt);
@@ -15,7 +15,7 @@ const Comment = ({ comment, userObj, id }) => {
     const q = window.confirm("한줄평을 삭제하시겠습니까?");
     if (q) {
       try {
-        await deleteDoc(doc(db, id, comment.id));
+        await deleteDoc(doc(db, "Users", userObj.uid, "Reviews", comment.id));
       } catch (error) {
         alert("알 수 없는 이유로 삭제가 되지 않았습니다.");
       }
@@ -33,13 +33,17 @@ const Comment = ({ comment, userObj, id }) => {
   };
   const onSubmit = async (event) => {
     event.preventDefault();
-    await updateDoc(doc(db, id, comment.id), "text", newComment);
+    await updateDoc(
+      doc(db, "Users", userObj.uid, "Reviews", comment.id),
+      "text",
+      newComment
+    );
     toggleEdit();
   };
   return (
     <div className={Style.commentBox}>
       <div className={Style.Name}>
-        {comment.displayName}
+        {comment.displayName + " : " + comment.movieTitle}
         {userObj.uid === comment.creator ? (
           <div className={Style.EditOrDelete}>
             <span onClick={toggleEdit}>{edit ? "취소" : "수정"}</span>/
@@ -69,4 +73,4 @@ const Comment = ({ comment, userObj, id }) => {
     </div>
   );
 };
-export default Comment;
+export default MyComment;

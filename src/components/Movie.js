@@ -3,6 +3,8 @@ import propTypes from "prop-types";
 import { Link } from "react-router-dom";
 import Style from "../styles/MovieStyle.module.css";
 import ReactModal from "react-modal";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../firebase";
 
 function Movie({ id, medium_cover_image, title, summary, genres, userObj }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +18,28 @@ function Movie({ id, medium_cover_image, title, summary, genres, userObj }) {
     } = event;
     setReservedSeat(value);
   };
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      if (reservedSeat !== "") {
+        await addDoc(collection(db, "Users", userObj.uid, "Reservation"), {
+          // Firestore 구조 : Users/user의 uid/영화고유넘버/Reservation
+          creator: userObj.uid,
+          displayName: userObj.displayName,
+          createdAt: Date.now(),
+          movieId: id,
+          movieTitle: title,
+          reservedSeat: reservedSeat,
+        });
+        setReservedSeat("");
+      }
+    } catch (e) {
+      alert("알 수 없는 이유로 등록 실패");
+      console.error("Error adding document: ", e);
+    }
+  };
+
   return (
     <div className={Style.Movie}>
       <img alt="cover_image" src={medium_cover_image} />
@@ -32,7 +56,7 @@ function Movie({ id, medium_cover_image, title, summary, genres, userObj }) {
         </ul>
         <button onClick={toggleModal}>예약하기</button>
         <ReactModal isOpen={isOpen}>
-          <form>
+          <form onSubmit={onSubmit}>
             예약할 인원 수 :{" "}
             <input
               type="number"
@@ -40,8 +64,8 @@ function Movie({ id, medium_cover_image, title, summary, genres, userObj }) {
               value={reservedSeat}
               onChange={onChange}
             />
+            <button>예약하기</button>
           </form>
-          <button>예약하기</button>
           <button onClick={toggleModal}>Close</button>
         </ReactModal>
       </div>
